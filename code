@@ -1,0 +1,47 @@
+!ngrok http 5000
+!pip install --upgrade flask flask-ngrok
+!pip install flask flask-ngrok
+
+from flask import Flask, render_template_string, request
+from flask_ngrok import run_with_ngrok
+
+app = Flask(__name__)
+run_with_ngrok(app)  # Start ngrok when app is run
+
+html_template = """
+<!doctype html>
+<html>
+<head>
+    <title>Hospital Appointment</title>
+</head>
+<body>
+    <h1>Schedule an Appointment</h1>
+    <form action="/submit" method="post">
+        <label for="name">Name:</label><br>
+        <input type="text" id="name" name="name" required><br><br>
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" name="email" required><br><br>
+        <label for="date">Date:</label><br>
+        <input type="date" id="date" name="date" required><br><br>
+        <label for="time">Time:</label><br>
+        <input type="time" id="time" name="time" required><br><br>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>
+"""
+
+@app.route('/')
+def home():
+    return render_template_string(html_template)
+
+@app.route('/submit', methods=['POST'])
+def submit():
+    name = request.form['name']
+    email = request.form['email']
+    date = request.form['date']
+    time = request.form['time']
+    return f"Appointment scheduled for {name} on {date} at {time}. Confirmation sent to {email}."
+
+if __name__ == '__main__':
+    app.run()
